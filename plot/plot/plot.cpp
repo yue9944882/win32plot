@@ -8,6 +8,7 @@
 #include<windowsx.h>
 #include<vector>
 #include<string>
+#include<math.h>
 
 
 #define MAX_LOADSTRING 100
@@ -26,19 +27,49 @@ TCHAR szWindowClass[MAX_LOADSTRING];			// 主窗口类名
 #define POLY_COS_BASE 3
 #define POLY_EXP_BASE 4
 
+
 typedef struct tagData{
 	int ptBeginX,ptBeginY;
 	int ptEndX,ptEndY;
 	int penStyle;
 }PAINTDATA;
 
-
+/*
 typedef struct tagNode{
-	int baseType;
-	int powNum;
-	int coffNum;
+	int baseType; // Base Of Polynomial
+	double powNum;
+	double coffNum;
 }POLYNODE;
+*/
 
+class SyntaxTree{
+	
+public:
+
+	SyntaxTree(){;}
+
+	SyntaxTree(std::string polynomial){
+
+	}
+};
+
+
+class POLYNODE{
+
+	int iLen;
+	SyntaxTree trSyn;
+
+public:
+	POLYNODE(){;}
+	POLYNODE(std::string polynomial){
+		trSyn=SyntaxTree(polynomial); // Shallow Copy
+	}
+	
+	double calc(double x){
+
+		return 0; // This line may never reach
+	}
+};
 
 // 此代码模块中包含的函数的前向声明:
 ATOM				MyRegisterClass(HINSTANCE hInstance);
@@ -95,6 +126,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 //
 //  目的: 注册窗口类。
 //
+
 ATOM MyRegisterClass(HINSTANCE hInstance)
 {
 	WNDCLASSEX wcex;
@@ -165,6 +197,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	HDC hdc;
 
 	static std::vector<PAINTDATA> datas;
+	static std::vector<PAINTDATA> coordinates;
+	static std::vector<PAINTDATA> ticks;
+	static std::vector<PAINTDATA> arrows;
+	
 	static PAINTDATA*pCurrentData=NULL;
 	static int penStyle=PS_SOLID;
 
@@ -275,6 +311,5 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	return (INT_PTR)FALSE;
 }
-
 
 
