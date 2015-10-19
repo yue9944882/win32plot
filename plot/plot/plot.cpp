@@ -5,6 +5,9 @@
 #include "plot.h"
 
 #include<Windows.h>
+#include<windowsx.h>
+#include<vector>
+
 
 #define MAX_LOADSTRING 100
 
@@ -16,6 +19,14 @@ TCHAR szTitle[MAX_LOADSTRING];					// 标题栏文本
 TCHAR szWindowClass[MAX_LOADSTRING];			// 主窗口类名
 
 
+
+typedef struct tagData{
+
+	int ptBeginX,ptBeginY;
+	int ptEndX,ptEndY;
+	int penStyle;
+
+}PAINTDATA;
 
 // 此代码模块中包含的函数的前向声明:
 ATOM				MyRegisterClass(HINSTANCE hInstance);
@@ -107,7 +118,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    hInst = hInstance; // 将实例句柄存储在全局变量中
 
    hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
+      CW_USEDEFAULT, 0, 500, 500, NULL, NULL, hInstance, NULL);
 
    if (!hWnd)
    {
@@ -137,9 +148,27 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	PAINTSTRUCT ps;
 	HDC hdc;
 
+	static std::vector<PAINTDATA> datas;
+	static PAINTDATA*pCurrentData=NULL;
+	static int penStyle=PS_SOLID;
+
+
 	switch (message)
 	{
+	case WM_CREATE:
+		{
+			HMENU menubar=CreateMenu();
+			HMENU menupop=CreatePopupMenu();
+			AppendMenu(menupop,MF_STRING,(UINT_PTR)PS_SOLID,L"实线");
+			AppendMenu(menupop,MF_STRING,(UINT_PTR)PS_DASH,L"虚线");
+			AppendMenu(menupop,MF_STRING,(UINT_PTR)PS_DOT,L"点线");
+			AppendMenu(menupop,MF_STRING,(UINT_PTR)PS_DASHDOT,L"点虚线");
+			AppendMenu(menubar,MF_STRING|MF_POPUP,(UINT_PTR)menupop,L"选择线型");
+			SetMenu(hWnd,menubar);
+		}
+		return 0;
 	case WM_COMMAND:
+
 		wmId    = LOWORD(wParam);
 		wmEvent = HIWORD(wParam);
 		// 分析菜单选择:
@@ -156,13 +185,56 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case WM_PAINT:
-		hdc = BeginPaint(hWnd, &ps);
-		// TODO: 在此添加任意绘图代码...
+		{
+			hdc = BeginPaint(hWnd, &ps);
+			
+			// TODO: 在此添加任意绘图代码...
+			PAINTSTRUCT ps;
+			BeginPaint(hWnd,&ps);
+			std::vector<PAINTDATA>::const_iterator item;
+
+			for(item=datas.begin();item!=datas.end();item++){
+				HPEN pen=CreatePen(item->penStyle,1,RGB(0,255,0));
+				SelectObject(ps.hdc,pen);
+				MoveToEx(ps.hdc,item->ptBeginX,item->ptBeginY,NULL);
+				LineTo(ps.hdc,item->ptEndX,item->ptEndY);
+				DeleteObject(pen);
+			}
+			EndPaint(hWnd,&ps);
+
 		EndPaint(hWnd, &ps);
+		}
 		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
+	
+	case WM_LBUTTONDOWN:
+		{
+			pCurrentData=new PAINTDATA;
+			pCurrentData->penStyle=penStyle;
+			pCurrentData->ptBeginX=GET_X_LPARAM(lParam);
+			pCurrentData->ptBeginY=GET_Y_LPARAM(lParam);
+		}
+		return 0;
+	case WM_LBUTTONUP:
+		{
+			if(pCurrentData!=NULL){
+				pCurrentData->ptEndX=GET_X_LPARAM(lParam);
+				pCurrentData->ptEndY=GET_Y_LPARAM(lParam);
+
+				HDC hdc=GetDC(hWnd);
+				HPEN pen=CreatePen(pCurrentData->penStyle,1,RGB(0,255,0));
+				HPEN oldpen=(HPEN)SelectObject(hdc,pen);
+				MoveToEx(hdc,pCurrentData->ptBeginX,pCurrentData->ptBeginY,NULL);
+				LineTo(hdc,pCurrentData->ptEndX,pCurrentData->ptEndY);
+				SelectObject(hdc,oldpen);
+				DeleteObject(pen);
+				ReleaseDC(hWnd,hdc);
+				datas.push_back(*pCurrentData);
+			}
+		}
+		return 0;
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
