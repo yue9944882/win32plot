@@ -34,6 +34,7 @@ typedef struct tagData{
 	int penStyle;
 }PAINTDATA;
 
+
 /*
 typedef struct tagNode{
 	int baseType; // Base Of Polynomial
@@ -42,6 +43,7 @@ typedef struct tagNode{
 }POLYNODE;
 */
 
+
 class SyntaxTree{
 	
 public:
@@ -49,7 +51,7 @@ public:
 	SyntaxTree(){;}
 
 	SyntaxTree(std::string polynomial){
-
+				
 	}
 };
 
