@@ -7,6 +7,7 @@
 #include<Windows.h>
 #include<windowsx.h>
 #include<vector>
+#include<string>
 
 
 #define MAX_LOADSTRING 100
@@ -19,20 +20,34 @@ TCHAR szTitle[MAX_LOADSTRING];					// 标题栏文本
 TCHAR szWindowClass[MAX_LOADSTRING];			// 主窗口类名
 
 
+#define POLY_X_BASE 0
+#define POLY_LOG_BASE 1
+#define POLY_SIN_BASE 2
+#define POLY_COS_BASE 3
+#define POLY_EXP_BASE 4
 
 typedef struct tagData{
-
 	int ptBeginX,ptBeginY;
 	int ptEndX,ptEndY;
 	int penStyle;
-
 }PAINTDATA;
+
+
+typedef struct tagNode{
+	int baseType;
+	int powNum;
+	int coffNum;
+}POLYNODE;
+
 
 // 此代码模块中包含的函数的前向声明:
 ATOM				MyRegisterClass(HINSTANCE hInstance);
 BOOL				InitInstance(HINSTANCE, int);
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
+
+
+
 
 
 int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
@@ -131,6 +146,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    return TRUE;
 }
 
+
 //
 //  函数: WndProc(HWND, UINT, WPARAM, LPARAM)
 //
@@ -200,9 +216,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				LineTo(ps.hdc,item->ptEndX,item->ptEndY);
 				DeleteObject(pen);
 			}
-			EndPaint(hWnd,&ps);
-
-		EndPaint(hWnd, &ps);
+			EndPaint(hWnd, &ps);
 		}
 		break;
 	case WM_DESTROY:
@@ -241,6 +255,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+
 // “关于”框的消息处理程序。
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -260,3 +275,6 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	return (INT_PTR)FALSE;
 }
+
+
+
