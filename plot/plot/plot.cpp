@@ -9,6 +9,9 @@
 #include<vector>
 #include<string>
 #include<math.h>
+#include<iterator>
+#include<stack>
+
 
 
 #define MAX_LOADSTRING 100
@@ -20,13 +23,13 @@ HINSTANCE hInst;								// 当前实例
 TCHAR szTitle[MAX_LOADSTRING];					// 标题栏文本
 TCHAR szWindowClass[MAX_LOADSTRING];			// 主窗口类名
 
-
+/*
 #define POLY_X_BASE 0
 #define POLY_LOG_BASE 1
 #define POLY_SIN_BASE 2
 #define POLY_COS_BASE 3
 #define POLY_EXP_BASE 4
-
+*/
 
 typedef struct tagData{
 	int ptBeginX,ptBeginY;
@@ -43,7 +46,7 @@ typedef struct tagNode{
 }POLYNODE;
 */
 
-
+/*
 class SyntaxTree{
 	
 public:
@@ -72,6 +75,9 @@ public:
 		return 0; // This line may never reach
 	}
 };
+*/
+
+
 
 // 此代码模块中包含的函数的前向声明:
 ATOM				MyRegisterClass(HINSTANCE hInstance);
@@ -88,6 +94,11 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
                      _In_ LPTSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
+	//*************
+
+	
+
+	//*************
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
