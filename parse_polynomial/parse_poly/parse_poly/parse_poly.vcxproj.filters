@@ -15,13 +15,34 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\syn_ana.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\TypeDef.h">
+    <ClInclude Include="global_val.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="VT_func.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="regex_trans.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="parse.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="VT_func.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="regex_trans.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="parse.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="global_val.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

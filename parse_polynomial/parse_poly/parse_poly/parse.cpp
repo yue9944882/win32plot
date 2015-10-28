@@ -1,0 +1,63 @@
+
+#include<string>
+#include"global_val.h"
+#include"regex_trans.h"
+#include"VT_func.h"
+
+
+int parse_poly(std::string expr){
+	
+	sigmap_init();
+
+	char*stack_buf=new char[1024];
+	
+	expr=expr+"#";
+	
+	int stack_pos=0;
+	int input_pos=0;
+	
+	int expr_len=0;
+	const char*expr_ptr=expr.c_str();
+	int expr_pos=0;
+	
+	//Pushing '#' into stack
+	stack_buf[stack_pos]='#';
+	stack_pos++;
+	
+	 int j;
+	
+	do{
+		
+		char a=expr_ptr[expr_pos++];
+		
+		if(stack_buf[stack_pos-1]!='N'){ j=stack_pos-1; }
+		else{ j=stack_pos-2; }
+		
+		char q;
+		while(1==VT_cmp(stack_buf[j],a)){
+			
+			do{
+				q=stack_buf[j];
+				if(stack_buf[j-1]=='N'){ j=j-1; }
+				else{ j=j-2; }
+			}while(VT_cmp(stack_buf[j],q)==-1);
+			
+			///	Parse into number
+			
+			//stack_transform(stack_buf,j+1,stack_pos-1);
+			
+		}
+		
+		if(VT_cmp(stack_buf[j],a)==-1||VT_cmp(stack_buf[j],a)==0){
+			stack_buf[stack_pos++]=a;
+		}else{
+			exit(0);
+		}
+		
+	}while(stack_buf[stack_pos-1]!='#');	
+	
+	delete []stack_buf;
+
+}
+ 
+ 

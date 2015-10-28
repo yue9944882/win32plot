@@ -62,10 +62,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\syn_ana.cpp" />
+    <ClCompile Include="..\..\main.cpp" />
+    <ClCompile Include="global_val.cpp" />
+    <ClCompile Include="parse.cpp" />
+    <ClCompile Include="regex_trans.cpp" />
+    <ClCompile Include="VT_func.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\TypeDef.h" />
+    <ClInclude Include="global_val.h" />
+    <ClInclude Include="parse.h" />
+    <ClInclude Include="regex_trans.h" />
+    <ClInclude Include="VT_func.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
