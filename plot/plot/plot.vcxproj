@@ -79,17 +79,26 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="global_val.h" />
+    <ClInclude Include="inter_change.h" />
+    <ClInclude Include="parse.h" />
     <ClInclude Include="plot.h" />
+    <ClInclude Include="regex_trans.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="VT_func.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="global_val.cpp" />
+    <ClCompile Include="parse.cpp" />
     <ClCompile Include="plot.cpp" />
+    <ClCompile Include="regex_trans.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="VT_func.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="plot.rc" />

@@ -47,7 +47,6 @@ float parse_poly(std::string expr){
 			}
 		}
 
-
 		if(stack_buf[stack_pos-1]!='N'){ j=stack_pos-1; }
 		else{ j=stack_pos-2; }
 		

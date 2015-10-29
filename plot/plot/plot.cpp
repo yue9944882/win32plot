@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "plot.h"
 
+
 #include<Windows.h>
 #include<windowsx.h>
 #include<vector>
@@ -12,7 +13,7 @@
 #include<iterator>
 #include<stack>
 
-
+using namespace std;
 
 #define MAX_LOADSTRING 100
 
@@ -23,60 +24,12 @@ HINSTANCE hInst;								// 当前实例
 TCHAR szTitle[MAX_LOADSTRING];					// 标题栏文本
 TCHAR szWindowClass[MAX_LOADSTRING];			// 主窗口类名
 
-/*
-#define POLY_X_BASE 0
-#define POLY_LOG_BASE 1
-#define POLY_SIN_BASE 2
-#define POLY_COS_BASE 3
-#define POLY_EXP_BASE 4
-*/
 
 typedef struct tagData{
 	int ptBeginX,ptBeginY;
 	int ptEndX,ptEndY;
 	int penStyle;
 }PAINTDATA;
-
-
-/*
-typedef struct tagNode{
-	int baseType; // Base Of Polynomial
-	double powNum;
-	double coffNum;
-}POLYNODE;
-*/
-
-/*
-class SyntaxTree{
-	
-public:
-
-	SyntaxTree(){;}
-
-	SyntaxTree(std::string polynomial){
-				
-	}
-};
-
-
-class POLYNODE{
-
-	int iLen;
-	SyntaxTree trSyn;
-
-public:
-	POLYNODE(){;}
-	POLYNODE(std::string polynomial){
-		trSyn=SyntaxTree(polynomial); // Shallow Copy
-	}
-	
-	double calc(double x){
-
-		return 0; // This line may never reach
-	}
-};
-*/
-
 
 
 // 此代码模块中包含的函数的前向声明:

@@ -17,5 +17,8 @@
 #include <memory.h>
 #include <tchar.h>
 
+#include"parse.h"
+#include"inter_change.h"
+
 
 // TODO: 在此处引用程序需要的其他头文件

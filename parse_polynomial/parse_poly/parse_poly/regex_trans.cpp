@@ -124,6 +124,12 @@ float calc(float fl,float fr,char op){
 		return fl/fr;
 	case '^':
 		return pow(fl,(int)fr);
+	case '&':
+		if(fl==1)return sin(fr);
+		if(fl==2)return log(fr);
+		if(fl==3)return cos(fr);
+		if(fl==4)return exp(fr);
+		break;
 	default:
 		break;
 	}

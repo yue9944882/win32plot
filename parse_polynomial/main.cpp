@@ -16,21 +16,12 @@
 
 // Module for Polynomial Analysis
 
-
-
-
-
-
-
-char str[100]="f(x)=1+4*x+1";
+char str[100]="f(x)=sin(sin(x))";
 char*sptr=str;
 
 
 
 int main(){
-	
-
-
 
 	while((*sptr)!='='){
 		sptr++;
@@ -38,10 +29,11 @@ int main(){
 
 	///Until the assignment operation then syntax analysis begin
 	
-
 	std::string s(sptr);
 
-	change_x(s,-1);
+	change_fx(s);
+
+	change_x(s,1);
 
 	float ret=parse_poly(s);
 
