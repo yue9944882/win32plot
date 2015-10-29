@@ -2,11 +2,10 @@
 
 =============================================
 
-A simple demo of plotting curves in the win32 environment
-
-
-Supporting Complicated Polynomial
-
+核心算法：
+	
+	1.算符优先文法自动机解析多项式
+	2.正则演算替换法
 
 
 ##Example:##
