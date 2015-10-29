@@ -1,5 +1,6 @@
-
 #include"stdafx.h"
+
+
 
 #include"global_val.h"
 
@@ -19,7 +20,8 @@ void sigmap_init(){
 	sigmap.insert(std::pair<char,int>('(',6));
 	sigmap.insert(std::pair<char,int>(')',7));
 	sigmap.insert(std::pair<char,int>('#',8));
-	sigmap.insert(std::pair<char,int>('^',9));	
+	sigmap.insert(std::pair<char,int>('^',9));
+	sigmap.insert(std::pair<char,int>('&',10));
 } 
 
 

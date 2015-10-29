@@ -91,6 +91,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="global_val.cpp" />
+    <ClCompile Include="inter_change.cpp" />
     <ClCompile Include="parse.cpp" />
     <ClCompile Include="plot.cpp" />
     <ClCompile Include="regex_trans.cpp" />

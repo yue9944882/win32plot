@@ -1,3 +1,4 @@
+
 #include"stdafx.h"
 
 
@@ -5,6 +6,7 @@
 #include"global_val.h"
 #include"regex_trans.h"
 #include"VT_func.h"
+
 
 float parse_poly(std::string expr){
 	
@@ -47,7 +49,6 @@ float parse_poly(std::string expr){
 				continue;
 			}
 		}
-
 
 		if(stack_buf[stack_pos-1]!='N'){ j=stack_pos-1; }
 		else{ j=stack_pos-2; }

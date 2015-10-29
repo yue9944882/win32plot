@@ -16,7 +16,7 @@
 
 // Module for Polynomial Analysis
 
-char str[100]="f(x)=sin(sin(x))";
+char str[100]="f(x)=log(x)";
 char*sptr=str;
 
 
@@ -33,7 +33,7 @@ int main(){
 
 	change_fx(s);
 
-	change_x(s,1);
+	change_x(s,-1);
 
 	float ret=parse_poly(s);
 

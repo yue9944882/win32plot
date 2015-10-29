@@ -65,6 +65,9 @@
     <ClCompile Include="global_val.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="inter_change.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="plot.rc">

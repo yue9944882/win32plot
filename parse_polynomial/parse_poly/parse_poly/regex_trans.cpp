@@ -121,12 +121,16 @@ float calc(float fl,float fr,char op){
 	case '*':
 		return fl*fr;
 	case '/':
-		return fl/fr;
+		if(fr)return fl/fr;
+		else return 0;
 	case '^':
 		return pow(fl,(int)fr);
 	case '&':
 		if(fl==1)return sin(fr);
-		if(fl==2)return log(fr);
+		if(fl==2){
+			if(fr>0)return log(fr);
+			else return 0;
+		}
 		if(fl==3)return cos(fr);
 		if(fl==4)return exp(fr);
 		break;
