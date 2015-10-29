@@ -12,7 +12,7 @@
  // -1 for < , +1 for > , 0 for equal
  // 
  //		\d	 +  -   * 	 / 	 .  ( 	 )  # 	 ^
- //	\d	-1  +1	+1	+1	+1	-1	-1 	+1	+1	+1 
+ //	\d	-1  +1	+1	+1	+1	-1	    +1	+1	+1 
  // + 	-1 	+1	+1	-1	-1 		-1 	+1	+1 	-1 
  //	- 	-1	+1	+1	-1	-1 		-1 	+1	+1 	-1 
  // * 	-1	+1	+1	+1	+1 		-1 	+1	+1 	-1 
@@ -29,7 +29,7 @@ extern int cmp_prio[10][10];
 
 //extern std::regex pattern_num;
 //extern std::regex pattern_ops;
-extern std::stack<int> N_stack;
+extern std::stack<float> N_stack;
 extern std::map<char,int> sigmap;
 
 

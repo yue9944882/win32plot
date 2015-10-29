@@ -5,9 +5,7 @@
 #include<string>
 
 
-extern int parse_poly(std::string expr);
-
-
+extern float parse_poly(std::string expr);
 
 
 #endif

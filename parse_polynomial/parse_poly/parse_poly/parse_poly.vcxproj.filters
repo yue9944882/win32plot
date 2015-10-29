@@ -27,6 +27,9 @@
     <ClInclude Include="parse.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="inter_change.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\main.cpp">
@@ -42,6 +45,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="global_val.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="inter_change.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

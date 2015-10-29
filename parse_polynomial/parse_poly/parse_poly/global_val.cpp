@@ -37,6 +37,6 @@ int cmp_prio[10][10]={
 
 //std::regex pattern_num("^(-?\\d*|-?\\d*.\\d*)$");
 //std::regex pattern_ops("^N(+|-|*|/|\\^)N$");
-std::stack<int> N_stack;
+std::stack<float> N_stack;
 std::map<char,int> sigmap;
 

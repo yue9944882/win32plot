@@ -1,4 +1,4 @@
-
+#include"parse_poly\parse_poly\inter_change.h"
 #include"parse_poly\parse_poly\parse.h"
 
 #include<string>
@@ -22,23 +22,15 @@
 
 
 
-char str[100]="f(x)=123+44*35+1135";
+char str[100]="f(x)=1+4*x+1";
 char*sptr=str;
 
 
 
 int main(){
 	
-/*
-	std::string s="-4.412";
-	std::regex pattern("(-?\\d*|-?\\d*.\\d*)");
-	std::match_results<std::string::const_iterator> result;
-	bool valid=std::regex_match(s,result,pattern);
 
-	if(valid){
-		std::cout<<"Catch:"<<result[1]<<std::endl;
-	}
-*/
+
 
 	while((*sptr)!='='){
 		sptr++;
@@ -46,13 +38,16 @@ int main(){
 
 	///Until the assignment operation then syntax analysis begin
 	
-	std::string expr(sptr);
+
+	std::string s(sptr);
+
+	change_x(s,-1);
+
+	float ret=parse_poly(s);
+
+
+	std::cout<<"Expression After:"<<ret<<std::endl;
 	
-	
-	
-	parse_poly(expr);
-	
-	std::cout<<"Expression After:"+expr<<std::endl;
 
 	system("pause");
 	
