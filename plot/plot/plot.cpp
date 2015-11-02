@@ -18,12 +18,19 @@ using namespace std;
 #define MAX_LOADSTRING 100
 
 
-#define ID_PAINT_BUTTON 1
-#define ID_TEXT_FIELD 2
-#define ID_MENU_SOLID 3
-#define ID_MENU_DASH 4
-#define ID_MENU_DOT 5
-#define ID_MENU_DASHDOT 6
+#define ID_PAINT_BUTTON 0x01
+#define ID_TEXT_FIELD 0x02
+#define ID_STATIC_HINT 0x03
+
+#define ID_MENU_IMAGE_CLEAR 0x11
+
+#define ID_MENU_PEN_COLOR_BLACK 0x21
+#define ID_MENU_PEN_COLOR_BLUE 0x22
+#define ID_MENU_PEN_COLOR_RED 0x23
+#define ID_MENU_PEN_COLOR_YELLOW 0x24
+#define ID_MENU_PEN_COLOR_GREEN 0x25
+#define ID_MENU_PEN_COLOR_PURPLE 0x26
+
 
 
 // 全局变量:
@@ -52,7 +59,7 @@ void paint_points(HWND hWnd,std::vector<PAINTDATA>&pts,PAINTSTRUCT&ps,COLORREF c
 void bounder_def(std::vector<PAINTDATA>&bounder);
 void coordinate_def(std::vector<PAINTDATA>&coordinate,std::vector<PAINTDATA>&arrow);
 void tick_def(std::vector<PAINTDATA>&ticks);
-
+void mark_def(std::vector<PAINTDATA>&marks);
 
 
 int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
@@ -183,7 +190,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	static HWND btnPaintHwnd;
 	static HWND edtPaintHwnd;
-
+	static HWND sttPaintHwnd_input;
+	static HWND sttPaintHwnd_numn;
+	static HWND sttPaintHwnd_nums;
+	static HWND sttPaintHwnd_nume;
+	static HWND sttPaintHwnd_numw;
+	static HWND sttPaintHwnd_numc;
+		 
 	static std::string poly;
 
 	static std::vector<PAINTDATA> datas;
@@ -192,10 +205,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	static std::vector<PAINTDATA> arrows;
 	static std::vector<PAINTDATA> bounders;
 	static std::vector<FPOINT> function;
+	static std::vector<PAINTDATA> marks;
 
 	static PAINTDATA*pCurrentData=NULL;
+
 	static int penStyle=PS_SOLID;
 
+	static COLORREF data_color=RGB(0,0,0);
 
 	switch (message)
 	{
@@ -204,8 +220,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			bounder_def(bounders);
 			coordinate_def(coordinates,arrows);
 			tick_def(ticks);
-			
+			mark_def(marks);
+
 			// Menu Defination
+			/*
 			HMENU menubar=CreateMenu();
 			HMENU menupop=CreatePopupMenu();
 			AppendMenu(menupop,MF_STRING,ID_MENU_SOLID,L"实线");
@@ -214,16 +232,49 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			AppendMenu(menupop,MF_STRING,ID_MENU_DASHDOT,L"点虚线");
 			AppendMenu(menubar,MF_STRING|MF_POPUP,(UINT_PTR)menupop,L"选择线型");
 			SetMenu(hWnd,menubar);
-
+			*/
+			HMENU menu_image=CreateMenu();
+			HMENU menupop_image=CreatePopupMenu();
+			HMENU menupop_pen=CreatePopupMenu();
+			HMENU menupop_pen_color=CreatePopupMenu();
+			AppendMenu(menupop_image,MF_STRING,ID_MENU_IMAGE_CLEAR,L"清空");
+			AppendMenu(menupop_pen_color,MF_STRING,ID_MENU_PEN_COLOR_BLACK,L"黑色");
+			AppendMenu(menupop_pen_color,MF_STRING,ID_MENU_PEN_COLOR_BLUE,L"蓝色");
+			AppendMenu(menupop_pen_color,MF_STRING,ID_MENU_PEN_COLOR_RED,L"红色");
+			AppendMenu(menupop_pen_color,MF_STRING,ID_MENU_PEN_COLOR_GREEN,L"绿色");
+			AppendMenu(menupop_pen_color,MF_STRING,ID_MENU_PEN_COLOR_YELLOW,L"黄色");
+			
+			
+			AppendMenu(menu_image,MF_STRING|MF_POPUP,(UINT_PTR)menupop_image,L"图像");
+			AppendMenu(menu_image,MF_STRING|MF_POPUP,(UINT_PTR)menupop_pen,L"画笔");
+			AppendMenu(menupop_pen,MF_STRING|MF_POPUP,(UINT_PTR)menupop_pen_color,L"颜色");
+			SetMenu(hWnd,menu_image);
 
 			// Child Window Defination
 			btnPaintHwnd=CreateWindow(TEXT("button"),TEXT("绘图"),WS_CHILD|WS_VISIBLE|BS_PUSHBUTTON,
-				400,530,80,30,hWnd,(HMENU)ID_PAINT_BUTTON,(HINSTANCE)GetWindowLong(hWnd,GWL_HINSTANCE),NULL);
+				440,530,60,25,hWnd,(HMENU)ID_PAINT_BUTTON,(HINSTANCE)GetWindowLong(hWnd,GWL_HINSTANCE),NULL);
 
 			edtPaintHwnd=CreateWindow(TEXT("edit"),TEXT("请在这里输入函数式（因变量为x）"),WS_CHILD|WS_VISIBLE|WS_BORDER,
-				30,530,350,30,hWnd,(HMENU)ID_TEXT_FIELD,((LPCREATESTRUCT)lParam)->hInstance,NULL);
-
+				70,530,350,25,hWnd,(HMENU)ID_TEXT_FIELD,((LPCREATESTRUCT)lParam)->hInstance,NULL);
 			
+			sttPaintHwnd_input=CreateWindow(TEXT("static"),TEXT("f(x)="),WS_CHILD|WS_VISIBLE,
+				40,530,30,25,hWnd,(HMENU)ID_STATIC_HINT,((LPCREATESTRUCT)lParam)->hInstance,NULL);
+			
+			sttPaintHwnd_numn=CreateWindow(TEXT("static"),TEXT("5"),WS_CHILD|WS_VISIBLE,
+				235,125,30,25,hWnd,(HMENU)ID_STATIC_HINT,((LPCREATESTRUCT)lParam)->hInstance,NULL);
+
+			sttPaintHwnd_nums=CreateWindow(TEXT("static"),TEXT("-5"),WS_CHILD|WS_VISIBLE,
+				235,375,30,25,hWnd,(HMENU)ID_STATIC_HINT,((LPCREATESTRUCT)lParam)->hInstance,NULL);
+			
+			sttPaintHwnd_nume=CreateWindow(TEXT("static"),TEXT("5"),WS_CHILD|WS_VISIBLE,
+				375,235,30,25,hWnd,(HMENU)ID_STATIC_HINT,((LPCREATESTRUCT)lParam)->hInstance,NULL);
+			
+			sttPaintHwnd_numw=CreateWindow(TEXT("static"),TEXT("-5"),WS_CHILD|WS_VISIBLE,
+				125,235,30,25,hWnd,(HMENU)ID_STATIC_HINT,((LPCREATESTRUCT)lParam)->hInstance,NULL);
+			
+			sttPaintHwnd_numc=CreateWindow(TEXT("static"),TEXT("0"),WS_CHILD|WS_VISIBLE,
+				245,240,30,25,hWnd,(HMENU)ID_STATIC_HINT,((LPCREATESTRUCT)lParam)->hInstance,NULL);
+
 		}
 		return 0;
 	case WM_COMMAND:
@@ -255,10 +306,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					change_fx(tmpstr);
 					change_x(tmpstr,x);
 					float y=parse_poly(tmpstr);
-					
 					fp.x=x;
 					fp.y=y;
-
 					function.push_back(fp);
 				}
 
@@ -281,14 +330,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				}
 
 				PAINTSTRUCT tmpps;
-
 				BeginPaint(hWnd,&tmpps);
-			
-				paint_points(hWnd,datas,tmpps,RGB(0,0,0));
-			
+				paint_points(hWnd,datas,tmpps,data_color);
 				EndPaint(hWnd, &tmpps);
-				
-
 				free(szBuffer);
 				break;
 			default:
@@ -303,6 +347,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case IDM_EXIT:
 			DestroyWindow(hWnd);
 			break;
+		case ID_MENU_IMAGE_CLEAR:
+			datas.clear();
+			InvalidateRect(hWnd,NULL,true);
+			UpdateWindow(hWnd);	
+			break;
+		case ID_MENU_PEN_COLOR_BLACK:
+			data_color=RGB(0,0,0);
+			break;
+		case ID_MENU_PEN_COLOR_RED:
+			data_color=RGB(220,20,60);
+			break;
+		case ID_MENU_PEN_COLOR_BLUE:
+			data_color=RGB(0,0,255);
+			break;
+		case ID_MENU_PEN_COLOR_GREEN:
+			data_color=RGB(50,205,50);
+			break;
+		case ID_MENU_PEN_COLOR_YELLOW:
+			data_color=RGB(255,255,0);
+			break;
 		default:
 			return DefWindowProc(hWnd, message, wParam, lParam);
 		}
@@ -314,34 +378,34 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			// TODO: 在此添加任意绘图代码...
 			PAINTSTRUCT ps;
 			BeginPaint(hWnd,&ps);
-			
 			// Paint Coordinates
-
-
 			paint_points(hWnd,bounders,ps,RGB(0,0,0));
 			paint_points(hWnd,ticks,ps,RGB(200,200,200));
 			paint_points(hWnd,coordinates,ps,RGB(0,0,0));
 			paint_points(hWnd,arrows,ps,RGB(0,0,0));
-			paint_points(hWnd,datas,ps,RGB(0,0,0));
-			
+			paint_points(hWnd,marks,ps,RGB(0,0,0));
+
+			paint_points(hWnd,datas,ps,data_color);
 
 			EndPaint(hWnd, &ps);
 		}
+		break;
+	case WM_CTLCOLORSTATIC:
+		SetBkMode((HDC)wParam,TRANSPARENT);
+		return (BOOL)((HBRUSH)GetStockObject(NULL_BRUSH));
 		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
 	
-/*
 	case WM_LBUTTONDOWN:
-		{
-			pCurrentData=new PAINTDATA;
-			pCurrentData->penStyle=penStyle;
-			pCurrentData->ptBeginX=GET_X_LPARAM(lParam);
-			pCurrentData->ptBeginY=GET_Y_LPARAM(lParam);
-		}
-		return 0;
-	case WM_LBUTTONUP:
+		datas.clear();
+		InvalidateRect(hWnd,NULL,true);
+		UpdateWindow(hWnd);	
+			
+		SetWindowText(sttPaintHwnd_input,TEXT("改了"));
+		break;
+/*	case WM_LBUTTONUP:
 		{
 			if(pCurrentData!=NULL){
 				pCurrentData->ptEndX=GET_X_LPARAM(lParam);
@@ -502,6 +566,29 @@ void tick_def(std::vector<PAINTDATA>&ticks){
 		tmpdata.ptEndX=510;
 		tmpdata.penStyle=penStyle;
 		ticks.push_back(tmpdata);
+		
+	}
+}
+
+void mark_def(std::vector<PAINTDATA>&marks){
+	PAINTDATA tmpdata;
+	int penStyle=PS_SOLID;
+	for(int i=1;i<20;i++){
+		tmpdata.ptBeginX=10+25*i;
+		if(i%5==0)tmpdata.ptBeginY=255;
+		else tmpdata.ptBeginY=258;
+		tmpdata.ptEndX=10+25*i;
+		if(i%5==0)tmpdata.ptEndY=265;
+		else tmpdata.ptEndY=263;
+		marks.push_back(tmpdata);
+	
+		tmpdata.ptBeginY=10+25*i;
+		if(i%5==0)tmpdata.ptBeginX=255;
+		else tmpdata.ptBeginX=258;
+		tmpdata.ptEndY=10+25*i;
+		if(i%5==0)tmpdata.ptEndX=265;
+		else tmpdata.ptEndX=262;
+		marks.push_back(tmpdata);
 		
 	}
 }
