@@ -23,6 +23,9 @@ using namespace std;
 #define ID_STATIC_HINT 0x03
 
 #define ID_MENU_IMAGE_CLEAR 0x11
+#define ID_MENU_IMAGE_TDIST 0x12
+#define ID_MENU_IMAGE_EXPORT 0x13
+
 
 #define ID_MENU_PEN_COLOR_BLACK 0x21
 #define ID_MENU_PEN_COLOR_BLUE 0x22
@@ -31,13 +34,16 @@ using namespace std;
 #define ID_MENU_PEN_COLOR_GREEN 0x25
 #define ID_MENU_PEN_COLOR_PURPLE 0x26
 
+#define ID_MENU_IMAGE_EXPORT_BMP 0x31
+#define ID_MENU_IMAGE_EXPORT_PDF 0x31
+
 
 
 // 全局变量:
 HINSTANCE hInst;								// 当前实例
 TCHAR szTitle[MAX_LOADSTRING];					// 标题栏文本
 TCHAR szWindowClass[MAX_LOADSTRING];			// 主窗口类名
-
+float g_fdist=5;
 
 typedef struct tagData{
 	int ptBeginX,ptBeginY;
@@ -55,11 +61,13 @@ ATOM				MyRegisterClass(HINSTANCE hInstance);
 BOOL				InitInstance(HINSTANCE, int);
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK	Dist(HWND ,UINT , WPARAM , LPARAM);
 void paint_points(HWND hWnd,std::vector<PAINTDATA>&pts,PAINTSTRUCT&ps,COLORREF color);
 void bounder_def(std::vector<PAINTDATA>&bounder);
 void coordinate_def(std::vector<PAINTDATA>&coordinate,std::vector<PAINTDATA>&arrow);
 void tick_def(std::vector<PAINTDATA>&ticks);
 void mark_def(std::vector<PAINTDATA>&marks);
+void write_bmp(HBITMAP hBitmap,TCHAR*str1);
 
 
 int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
@@ -178,6 +186,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 //
 
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	int wmId, wmEvent;
@@ -233,22 +242,29 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			AppendMenu(menubar,MF_STRING|MF_POPUP,(UINT_PTR)menupop,L"选择线型");
 			SetMenu(hWnd,menubar);
 			*/
-			HMENU menu_image=CreateMenu();
+			HMENU menu=CreateMenu();
 			HMENU menupop_image=CreatePopupMenu();
 			HMENU menupop_pen=CreatePopupMenu();
 			HMENU menupop_pen_color=CreatePopupMenu();
+			HMENU menupop_image_exp=CreatePopupMenu();
+
 			AppendMenu(menupop_image,MF_STRING,ID_MENU_IMAGE_CLEAR,L"清空");
+			AppendMenu(menupop_image,MF_STRING,ID_MENU_IMAGE_TDIST,L"缩放");
+			//AppendMenu(menupop_image,MF_STRING,ID_MENU_IMAGE_EXPORT,L"导出");
 			AppendMenu(menupop_pen_color,MF_STRING,ID_MENU_PEN_COLOR_BLACK,L"黑色");
 			AppendMenu(menupop_pen_color,MF_STRING,ID_MENU_PEN_COLOR_BLUE,L"蓝色");
 			AppendMenu(menupop_pen_color,MF_STRING,ID_MENU_PEN_COLOR_RED,L"红色");
 			AppendMenu(menupop_pen_color,MF_STRING,ID_MENU_PEN_COLOR_GREEN,L"绿色");
 			AppendMenu(menupop_pen_color,MF_STRING,ID_MENU_PEN_COLOR_YELLOW,L"黄色");
+			AppendMenu(menupop_image_exp,MF_STRING,ID_MENU_IMAGE_EXPORT_BMP,L"BMP格式");
+			AppendMenu(menupop_image_exp,MF_STRING,ID_MENU_IMAGE_EXPORT_PDF,L"PDF格式");
 			
-			
-			AppendMenu(menu_image,MF_STRING|MF_POPUP,(UINT_PTR)menupop_image,L"图像");
-			AppendMenu(menu_image,MF_STRING|MF_POPUP,(UINT_PTR)menupop_pen,L"画笔");
+
+			AppendMenu(menu,MF_STRING|MF_POPUP,(UINT_PTR)menupop_image,L"图像");
+			AppendMenu(menu,MF_STRING|MF_POPUP,(UINT_PTR)menupop_pen,L"画笔");
 			AppendMenu(menupop_pen,MF_STRING|MF_POPUP,(UINT_PTR)menupop_pen_color,L"颜色");
-			SetMenu(hWnd,menu_image);
+			AppendMenu(menupop_image,MF_STRING|MF_POPUP,(UINT_PTR)menupop_image_exp,L"导出");
+			SetMenu(hWnd,menu);
 
 			// Child Window Defination
 			btnPaintHwnd=CreateWindow(TEXT("button"),TEXT("绘图"),WS_CHILD|WS_VISIBLE|BS_PUSHBUTTON,
@@ -352,6 +368,53 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			InvalidateRect(hWnd,NULL,true);
 			UpdateWindow(hWnd);	
 			break;
+		case ID_MENU_IMAGE_TDIST:
+
+			//
+			{
+				TCHAR tmpBuff[512];
+				DialogBox(hInst,MAKEINTRESOURCE(IDD_DISTBOX),hWnd,Dist);
+				if(g_fdist>0)tick_dist=g_fdist;
+				swprintf_s(tmpBuff,512,L"%f",tick_dist*5);
+				SetWindowText(sttPaintHwnd_numn,tmpBuff);
+				SetWindowText(sttPaintHwnd_nums,tmpBuff);
+				SetWindowText(sttPaintHwnd_numw,tmpBuff);
+				SetWindowText(sttPaintHwnd_nume,tmpBuff);
+				datas.clear();
+				InvalidateRect(hWnd,NULL,true);
+				UpdateWindow(hWnd);	
+			
+			}
+			tick_dist=g_fdist;
+
+			break;
+
+		case ID_MENU_IMAGE_EXPORT_BMP:
+			{
+				HDC hdc=GetDC(hWnd);
+				HDC memdc=CreateCompatibleDC(hdc);
+				RECT rect;
+				GetWindowRect(hWnd,&rect);
+				SIZE bmpsize;
+				bmpsize.cx=520;
+				bmpsize.cy=520;
+
+				HBITMAP hBitmap=CreateCompatibleBitmap(hdc,bmpsize.cx,bmpsize.cy);
+				HGDIOBJ hOldBMP=SelectObject(memdc,hBitmap);
+				BitBlt(memdc,0,0,bmpsize.cx,bmpsize.cy,hdc,0,0,SRCCOPY);
+				SelectObject(memdc,hOldBMP);
+				DeleteObject(memdc);
+				ReleaseDC(hWnd,hdc);
+
+				TCHAR fname[512];
+				SYSTEMTIME st;
+				GetLocalTime(&st);
+				swprintf_s(fname,L"%2d_%2d_%d_%d_%d.bmp",st.wMonth,st.wDay,st.wHour,st.wMinute,st.wSecond);
+			
+				write_bmp(hBitmap,fname);
+			
+			}
+			break;
 		case ID_MENU_PEN_COLOR_BLACK:
 			data_color=RGB(0,0,0);
 			break;
@@ -399,11 +462,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	
 	case WM_LBUTTONDOWN:
-		datas.clear();
-		InvalidateRect(hWnd,NULL,true);
-		UpdateWindow(hWnd);	
+		//datas.clear();
+		//InvalidateRect(hWnd,NULL,true);
+		//UpdateWindow(hWnd);	
 			
-		SetWindowText(sttPaintHwnd_input,TEXT("改了"));
+		//SetWindowText(sttPaintHwnd_input,TEXT("改了"));
 		break;
 /*	case WM_LBUTTONUP:
 		{
@@ -449,6 +512,33 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	return (INT_PTR)FALSE;
 }
 
+INT_PTR CALLBACK Dist(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	TCHAR szwBuffer[512];
+	char szBuffer[512];
+	UNREFERENCED_PARAMETER(lParam);
+	switch (message)
+	{
+	case WM_INITDIALOG:
+		return (INT_PTR)TRUE;
+
+	case WM_COMMAND:
+
+		if (LOWORD(wParam) == IDCANCEL)
+		{
+			EndDialog(hDlg, LOWORD(wParam));
+			return (INT_PTR)TRUE;
+		}else if(LOWORD(wParam)==IDOK){
+			GetDlgItemText(hDlg,IDC_EDIT1,szwBuffer,512);
+			sprintf_s(szBuffer,512,"%S",szwBuffer);
+			g_fdist=atof(szBuffer);
+			EndDialog(hDlg,LOWORD(wParam));
+			return (INT_PTR)TRUE;
+		}
+		break;
+	}
+	return (INT_PTR)FALSE;
+}
 
 void paint_points(HWND hWnd,std::vector<PAINTDATA>&pts,PAINTSTRUCT&ps,COLORREF color){
 	std::vector<PAINTDATA>::const_iterator item;
@@ -591,4 +681,106 @@ void mark_def(std::vector<PAINTDATA>&marks){
 		marks.push_back(tmpdata);
 		
 	}
+}
+
+
+void write_bmp(HBITMAP hBitmap,TCHAR*str1){
+
+	HDC hDC =::CreateDC(L"DISPLAY",NULL,NULL,NULL);  
+    int iBits = ::GetDeviceCaps(hDC, BITSPIXEL) * ::GetDeviceCaps(hDC, PLANES);//当前分辨率下每个像素所占字节数    
+    DeleteDC(hDC); 
+
+	WORD   wBitCount;   //位图中每个像素所占字节数      
+    if (iBits <= 1)  
+        wBitCount = 1;  
+    else if (iBits <= 4)  
+        wBitCount = 4;  
+    else if (iBits <= 8)  
+        wBitCount = 8;  
+    else if (iBits <= 24)  
+        wBitCount = 24;  
+    else  
+        wBitCount = iBits;  
+
+	DWORD   dwPaletteSize=0;    //调色板大小， 位图中像素字节大小  
+    if (wBitCount <= 8)          
+        dwPaletteSize = (1 << wBitCount) *    sizeof(RGBQUAD);      
+    
+	BITMAP  bm;        //位图属性结构  
+    ::GetObject(hBitmap, sizeof(bm), (LPSTR)&bm);    
+  
+      
+    BITMAPINFOHEADER   bi,bi1;       //位图信息头结构       
+    bi.biSize            = sizeof(BITMAPINFOHEADER);    
+    bi.biWidth           = bm.bmWidth;  
+    bi.biHeight          = bm.bmHeight;  
+    bi.biPlanes          = 1;  
+    bi.biBitCount        = wBitCount;  
+    bi.biCompression     = BI_RGB; //BI_RGB表示位图没有压缩  
+    bi.biSizeImage       = 0;  
+    bi.biXPelsPerMeter   = 0;  
+    bi.biYPelsPerMeter   = 0;  
+    bi.biClrUsed         = 0;  
+    bi.biClrImportant    = 0;  
+    bi1=bi;  
+    bi1.biBitCount=24;  
+
+	DWORD dwBmBitsSize = ((bm.bmWidth * wBitCount+31)/32) * 4 * bm.bmHeight;     
+    HANDLE hDib  = ::GlobalAlloc(GHND,dwBmBitsSize + dwPaletteSize + sizeof(BITMAPINFOHEADER));  //为位图内容分配内存  
+    LPBITMAPINFOHEADER lpbi = (LPBITMAPINFOHEADER)GlobalLock(hDib);  
+    *lpbi = bi;  
+      
+    HANDLE hPal = ::GetStockObject(DEFAULT_PALETTE);  // 处理调色板  
+    HANDLE  hOldPal=NULL;  
+    if (hPal)  
+    {  
+        hDC = ::GetDC(NULL);  
+        hOldPal = SelectPalette(hDC,(HPALETTE)hPal, FALSE);  
+        RealizePalette(hDC);  
+    }  
+    int nOutputBytes = 0;  
+    unsigned char *pJpp,*m_pDibBits;  
+    pJpp = new unsigned char [dwBmBitsSize];  
+    m_pDibBits = new unsigned char [dwBmBitsSize];  
+    //::GetDIBits(hDC, hBitmap, 0, (UINT) bm.bmHeight,m_pDibBits,(BITMAPINFO*)lpbi,DIB_RGB_COLORS);  
+    ::GetDIBits(hDC, hBitmap, 0, (UINT) bm.bmHeight,(LPSTR)lpbi + sizeof(BITMAPINFOHEADER)+dwPaletteSize,(BITMAPINFO*)lpbi,DIB_RGB_COLORS);// 获取该调色板下新的像素值  
+
+	if (hOldPal)//恢复调色板  
+    {  
+        SelectPalette(hDC, (HPALETTE)hOldPal, TRUE);  
+        RealizePalette(hDC);  
+        ::ReleaseDC(NULL, hDC);  
+    }  
+    memcpy(m_pDibBits,(LPSTR)lpbi+sizeof(BITMAPINFOHEADER)+dwPaletteSize,dwBmBitsSize); 
+
+	BITMAPFILEHEADER   bmfHdr; //位图文件头结构       
+    bmfHdr.bfType = 0x4D42;  // "BM"      // 设置位图文件头  
+    DWORD dwDIBSize = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + dwPaletteSize + dwBmBitsSize;    
+    bmfHdr.bfSize = dwDIBSize;  
+    bmfHdr.bfReserved1 = 0;  
+    bmfHdr.bfReserved2 = 0;  
+    bmfHdr.bfOffBits = (DWORD)sizeof(BITMAPFILEHEADER) + (DWORD)sizeof(BITMAPINFOHEADER) + dwPaletteSize;  
+      
+    HANDLE hFile = CreateFile(str1, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);//创建位图文件   
+
+	int s=GetLastError();
+
+	DWORD dwWritten;  
+    WriteFile(hFile, (LPSTR)&bmfHdr, sizeof(BITMAPFILEHEADER), &dwWritten, NULL);    // 写入位图文件头  
+    WriteFile(hFile, (LPSTR)lpbi, dwDIBSize, &dwWritten, NULL);// 写入位图文件其余内容  
+       
+    //保存到内存  
+    char* BmpBuffer;  
+    BmpBuffer = new char [sizeof(BITMAPFILEHEADER) + dwDIBSize];  
+    memcpy(BmpBuffer,(LPSTR)&bmfHdr, sizeof(BITMAPFILEHEADER));  
+    memcpy(BmpBuffer+sizeof(BITMAPFILEHEADER),(LPSTR)lpbi, dwDIBSize);  
+  
+    GlobalUnlock(hDib);   //清除     
+    GlobalFree(hDib);  
+    CloseHandle(hFile);  
+    
+	delete []pJpp;  
+    delete []m_pDibBits;  
+
+
 }
