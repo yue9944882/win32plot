@@ -12,8 +12,15 @@
 #include<math.h>
 #include<iterator>
 #include<stack>
+#include<gdiplus.h>
+#include<string.h>
 
-using namespace std;
+
+
+
+using namespace Gdiplus;
+
+#pragma comment(lib,"gdiplus.lib")
 
 #define MAX_LOADSTRING 100
 
@@ -35,7 +42,7 @@ using namespace std;
 #define ID_MENU_PEN_COLOR_PURPLE 0x26
 
 #define ID_MENU_IMAGE_EXPORT_BMP 0x31
-#define ID_MENU_IMAGE_EXPORT_PDF 0x31
+#define ID_MENU_IMAGE_EXPORT_PNG 0x32
 
 
 
@@ -68,7 +75,7 @@ void coordinate_def(std::vector<PAINTDATA>&coordinate,std::vector<PAINTDATA>&arr
 void tick_def(std::vector<PAINTDATA>&ticks);
 void mark_def(std::vector<PAINTDATA>&marks);
 void write_bmp(HBITMAP hBitmap,TCHAR*str1);
-
+void write_png(HBITMAP hBitmap,TCHAR*str1);
 
 int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -77,7 +84,6 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 {
 	//*************
 
-	
 
 	//*************
 	UNREFERENCED_PARAMETER(hPrevInstance);
@@ -88,10 +94,10 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	HACCEL hAccelTable;
 
 
-
 	// 初始化全局字符串
 	LoadString(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
 	LoadString(hInstance, IDC_PLOT, szWindowClass, MAX_LOADSTRING);
+		
 	MyRegisterClass(hInstance);
 
 	// 执行应用程序初始化:
@@ -257,7 +263,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			AppendMenu(menupop_pen_color,MF_STRING,ID_MENU_PEN_COLOR_GREEN,L"绿色");
 			AppendMenu(menupop_pen_color,MF_STRING,ID_MENU_PEN_COLOR_YELLOW,L"黄色");
 			AppendMenu(menupop_image_exp,MF_STRING,ID_MENU_IMAGE_EXPORT_BMP,L"BMP格式");
-			AppendMenu(menupop_image_exp,MF_STRING,ID_MENU_IMAGE_EXPORT_PDF,L"PDF格式");
+			AppendMenu(menupop_image_exp,MF_STRING,ID_MENU_IMAGE_EXPORT_PNG,L"PNG格式");
 			
 
 			AppendMenu(menu,MF_STRING|MF_POPUP,(UINT_PTR)menupop_image,L"图像");
@@ -268,7 +274,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			// Child Window Defination
 			btnPaintHwnd=CreateWindow(TEXT("button"),TEXT("绘图"),WS_CHILD|WS_VISIBLE|BS_PUSHBUTTON,
-				440,530,60,25,hWnd,(HMENU)ID_PAINT_BUTTON,(HINSTANCE)GetWindowLong(hWnd,GWL_HINSTANCE),NULL);
+				430,530,80,25,hWnd,(HMENU)ID_PAINT_BUTTON,(HINSTANCE)GetWindowLong(hWnd,GWL_HINSTANCE),NULL);
 
 			edtPaintHwnd=CreateWindow(TEXT("edit"),TEXT("请在这里输入函数式（因变量为x）"),WS_CHILD|WS_VISIBLE|WS_BORDER,
 				70,530,350,25,hWnd,(HMENU)ID_TEXT_FIELD,((LPCREATESTRUCT)lParam)->hInstance,NULL);
@@ -309,7 +315,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 				szBuffer=(TCHAR*)malloc(1024*sizeof(TCHAR));
 				GetWindowText(edtPaintHwnd,szBuffer,1024);
-				MessageBox(hWnd,szBuffer,TEXT("BUTTON MESSAGE"),MB_OK);
+
+				//MessageBox(hWnd,szBuffer,TEXT("BUTTON MESSAGE"),MB_OK);
+				SetWindowText(btnPaintHwnd,L"生成中..");
+				EnableWindow(btnPaintHwnd,false);
+
 				sprintf_s(szExpr,1024,"%S",szBuffer);
 
 				poly=std::string(szExpr);
@@ -350,6 +360,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				paint_points(hWnd,datas,tmpps,data_color);
 				EndPaint(hWnd, &tmpps);
 				free(szBuffer);
+				EnableWindow(btnPaintHwnd,true);
+				SetWindowText(btnPaintHwnd,L"绘图");
 				break;
 			default:
 				break;
@@ -412,9 +424,40 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				swprintf_s(fname,L"%2d_%2d_%d_%d_%d.bmp",st.wMonth,st.wDay,st.wHour,st.wMinute,st.wSecond);
 			
 				write_bmp(hBitmap,fname);
+				MessageBox(hWnd,L"BMP格式图像成功生成！请见程序所在目录！",L"成功",MB_OK);
 			
 			}
 			break;
+
+		case ID_MENU_IMAGE_EXPORT_PNG:
+						
+			{
+				HDC hdc=GetDC(hWnd);
+				HDC memdc=CreateCompatibleDC(hdc);
+				RECT rect;
+				GetWindowRect(hWnd,&rect);
+				SIZE bmpsize;
+				bmpsize.cx=520;
+				bmpsize.cy=520;
+
+				HBITMAP hBitmap=CreateCompatibleBitmap(hdc,bmpsize.cx,bmpsize.cy);
+				HGDIOBJ hOldBMP=SelectObject(memdc,hBitmap);
+				BitBlt(memdc,0,0,bmpsize.cx,bmpsize.cy,hdc,0,0,SRCCOPY);
+				SelectObject(memdc,hOldBMP);
+				DeleteObject(memdc);
+				ReleaseDC(hWnd,hdc);
+
+				TCHAR fname[512];
+				SYSTEMTIME st;
+				GetLocalTime(&st);
+				swprintf_s(fname,L"%2d_%2d_%d_%d_%d.png",st.wMonth,st.wDay,st.wHour,st.wMinute,st.wSecond);
+			
+				write_png(hBitmap,fname);
+				
+				MessageBox(hWnd,L"PNG格式图像成功生成！请见程序所在目录！",L"成功",MB_OK);
+			}
+			break;
+
 		case ID_MENU_PEN_COLOR_BLACK:
 			data_color=RGB(0,0,0);
 			break;
@@ -492,6 +535,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 
+
+
+
+
 // “关于”框的消息处理程序。
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -541,6 +588,9 @@ INT_PTR CALLBACK Dist(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 void paint_points(HWND hWnd,std::vector<PAINTDATA>&pts,PAINTSTRUCT&ps,COLORREF color){
+
+
+
 	std::vector<PAINTDATA>::const_iterator item;
 	HDC hdc=GetDC(hWnd);
 	for(item=pts.begin();item!=pts.end();item++){
@@ -559,6 +609,7 @@ void paint_points(HWND hWnd,std::vector<PAINTDATA>&pts,PAINTSTRUCT&ps,COLORREF c
 
 void bounder_def(std::vector<PAINTDATA>&bounder){
 
+	
 	PAINTDATA tmpdata;
 	int penStyle=PS_DASH;
 
@@ -686,8 +737,8 @@ void mark_def(std::vector<PAINTDATA>&marks){
 
 void write_bmp(HBITMAP hBitmap,TCHAR*str1){
 
-	HDC hDC =::CreateDC(L"DISPLAY",NULL,NULL,NULL);  
-    int iBits = ::GetDeviceCaps(hDC, BITSPIXEL) * ::GetDeviceCaps(hDC, PLANES);//当前分辨率下每个像素所占字节数    
+	HDC hDC =CreateDC(L"DISPLAY",NULL,NULL,NULL);  
+    int iBits = GetDeviceCaps(hDC, BITSPIXEL) * GetDeviceCaps(hDC, PLANES);//当前分辨率下每个像素所占字节数    
     DeleteDC(hDC); 
 
 	WORD   wBitCount;   //位图中每个像素所占字节数      
@@ -743,12 +794,12 @@ void write_bmp(HBITMAP hBitmap,TCHAR*str1){
     pJpp = new unsigned char [dwBmBitsSize];  
     m_pDibBits = new unsigned char [dwBmBitsSize];  
     //::GetDIBits(hDC, hBitmap, 0, (UINT) bm.bmHeight,m_pDibBits,(BITMAPINFO*)lpbi,DIB_RGB_COLORS);  
-    ::GetDIBits(hDC, hBitmap, 0, (UINT) bm.bmHeight,(LPSTR)lpbi + sizeof(BITMAPINFOHEADER)+dwPaletteSize,(BITMAPINFO*)lpbi,DIB_RGB_COLORS);// 获取该调色板下新的像素值  
+    GetDIBits(hDC, hBitmap, 0, (UINT) bm.bmHeight,(LPSTR)lpbi + sizeof(BITMAPINFOHEADER)+dwPaletteSize,(BITMAPINFO*)lpbi,DIB_RGB_COLORS);// 获取该调色板下新的像素值  
 
 	if (hOldPal)//恢复调色板  
     {  
         SelectPalette(hDC, (HPALETTE)hOldPal, TRUE);  
-        RealizePalette(hDC);  
+        RealizePalette(hDC);										
         ::ReleaseDC(NULL, hDC);  
     }  
     memcpy(m_pDibBits,(LPSTR)lpbi+sizeof(BITMAPINFOHEADER)+dwPaletteSize,dwBmBitsSize); 
@@ -784,3 +835,50 @@ void write_bmp(HBITMAP hBitmap,TCHAR*str1){
 
 
 }
+
+
+int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
+{
+        UINT  num = 0;          // number of image encoders
+        UINT  size = 0;         // size of the image encoder array in bytes
+
+        ImageCodecInfo* pImageCodecInfo = NULL;
+
+        ::GetImageEncodersSize(&num, &size);
+        if(size == 0)
+        return -1;  // Failure
+
+        pImageCodecInfo = (ImageCodecInfo*)(malloc(size));
+        if(pImageCodecInfo == NULL)
+        return -1;  // Failure
+
+        ::GetImageEncoders(num, size, pImageCodecInfo);
+
+        for(UINT j = 0; j < num; ++j)
+        {
+                if( wcscmp(pImageCodecInfo[j].MimeType, format) == 0 )
+                {
+                        *pClsid = pImageCodecInfo[j].Clsid;
+                        free(pImageCodecInfo);
+                        return j;  // Success
+                }
+        }
+
+        free(pImageCodecInfo);
+        return -1;  // Failure
+}
+
+void write_png(HBITMAP hBitmap,TCHAR*str1){
+	GdiplusStartupInput ginput;
+	ULONG_PTR gditoken;
+	GdiplusStartup(&gditoken,&ginput,NULL);
+
+	Bitmap*pb=Bitmap::FromHBITMAP(hBitmap,NULL);
+	WCHAR*filename=str1;
+	CLSID pngclsid;
+	GetEncoderClsid(L"image/png",&pngclsid);
+	pb->Save(filename,&pngclsid,NULL);
+
+	GdiplusShutdown(gditoken);
+
+  }
