@@ -32,7 +32,7 @@ using namespace Gdiplus;
 #define ID_MENU_IMAGE_CLEAR 0x11
 #define ID_MENU_IMAGE_TDIST 0x12
 #define ID_MENU_IMAGE_EXPORT 0x13
-
+#define ID_MENU_IMAGE_IMPORT 0x14
 
 #define ID_MENU_PEN_COLOR_BLACK 0x21
 #define ID_MENU_PEN_COLOR_BLUE 0x22
@@ -270,6 +270,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			AppendMenu(menu,MF_STRING|MF_POPUP,(UINT_PTR)menupop_pen,L"画笔");
 			AppendMenu(menupop_pen,MF_STRING|MF_POPUP,(UINT_PTR)menupop_pen_color,L"颜色");
 			AppendMenu(menupop_image,MF_STRING|MF_POPUP,(UINT_PTR)menupop_image_exp,L"导出");
+			AppendMenu(menupop_image,MF_STRING,ID_MENU_IMAGE_IMPORT,L"导入");
 			SetMenu(hWnd,menu);
 
 			// Child Window Defination
@@ -379,6 +380,50 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			datas.clear();
 			InvalidateRect(hWnd,NULL,true);
 			UpdateWindow(hWnd);	
+			break;
+		case ID_MENU_IMAGE_IMPORT:
+			{
+				SetWindowText(btnPaintHwnd,L"生成中..");
+				EnableWindow(btnPaintHwnd,false);
+
+				WCHAR name[MAX_PATH];
+				OPENFILENAME ofn;
+				memset(&ofn,0,sizeof(OPENFILENAME));
+				memset(name,0,MAX_PATH);
+				ofn.lStructSize=sizeof(OPENFILENAME);
+				ofn.lpstrFile=name;
+				ofn.nMaxFile=MAX_PATH;
+				static TCHAR szFilter[] = TEXT("Csv Files(*.csv)\0*.csv\0") \
+					TEXT("All Files(*.*)\0*.*\0\0");
+				ofn.lpstrFilter=szFilter;
+				ofn.Flags=OFN_FILEMUSTEXIST;
+				if(GetOpenFileName(&ofn)){
+					//MessageBox(hWnd,name,L"title",MB_OK);
+					WCHAR strbuf[1024];
+					FILE*file;
+					WCHAR*strtoken=NULL;
+					WCHAR*strnext=NULL;
+					_wfopen_s(&file,name,L"r");
+					
+					while(fgetws(strbuf,1024,file)!=NULL){
+						int len=wcslen(strbuf);
+						strbuf[len-1]='\0';
+						strtoken=wcstok_s(strbuf,L",",&strnext);
+						while(strtoken!=NULL){
+							SetWindowText(edtPaintHwnd,strtoken);
+							SendMessage(hWnd,WM_COMMAND,MAKELONG(ID_PAINT_BUTTON,BN_CLICKED),(LPARAM)btnPaintHwnd);
+							strtoken=wcstok_s(NULL,L",",&strnext);			
+						}
+											
+					}
+
+					fclose(file);
+
+					SetWindowText(btnPaintHwnd,L"绘图");
+					EnableWindow(btnPaintHwnd,true);
+
+				}
+			}
 			break;
 		case ID_MENU_IMAGE_TDIST:
 
@@ -505,6 +550,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	
 	case WM_LBUTTONDOWN:
+		
 		//datas.clear();
 		//InvalidateRect(hWnd,NULL,true);
 		//UpdateWindow(hWnd);	
