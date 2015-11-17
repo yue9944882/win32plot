@@ -1,13 +1,13 @@
-﻿生成启动时间为 2015/11/16 16:16:56。
+﻿生成启动时间为 2015/11/16 19:34:22。
      1>项目“C:\Users\guguli\Documents\GitHub\win32plot\plot\plot\plot.vcxproj”在节点 2 上(Build 个目标)。
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"Debug\plot.pch" /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt plot.cpp
          plot.cpp
-     1>c:\users\guguli\documents\github\win32plot\plot\plot\plot.cpp(342): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
-     1>c:\users\guguli\documents\github\win32plot\plot\plot\plot.cpp(343): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
      1>c:\users\guguli\documents\github\win32plot\plot\plot\plot.cpp(344): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
      1>c:\users\guguli\documents\github\win32plot\plot\plot\plot.cpp(345): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
-     1>c:\users\guguli\documents\github\win32plot\plot\plot\plot.cpp(627): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+     1>c:\users\guguli\documents\github\win32plot\plot\plot\plot.cpp(346): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
+     1>c:\users\guguli\documents\github\win32plot\plot\plot\plot.cpp(347): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
+     1>c:\users\guguli\documents\github\win32plot\plot\plot\plot.cpp(636): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\guguli\Documents\GitHub\win32plot\plot\Debug\plot.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\guguli\Documents\GitHub\win32plot\plot\Debug\plot.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\guguli\Documents\GitHub\win32plot\plot\Debug\plot.lib" /MACHINE:X86 Debug\plot.res
          Debug\global_val.obj
@@ -22,4 +22,4 @@
 
 生成成功。
 
-已用时间 00:00:01.72
+已用时间 00:00:00.98

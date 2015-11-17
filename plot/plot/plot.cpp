@@ -76,6 +76,8 @@ void tick_def(std::vector<PAINTDATA>&ticks);
 void mark_def(std::vector<PAINTDATA>&marks);
 void write_bmp(HBITMAP hBitmap,TCHAR*str1);
 void write_png(HBITMAP hBitmap,TCHAR*str1);
+void get_export_dir(WCHAR*);
+
 
 int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -469,7 +471,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				swprintf_s(fname,L"%2d_%2d_%d_%d_%d.bmp",st.wMonth,st.wDay,st.wHour,st.wMinute,st.wSecond);
 			
 				write_bmp(hBitmap,fname);
-				MessageBox(hWnd,L"BMP格式图像成功生成！请见程序所在目录！",L"成功",MB_OK);
+				MessageBox(hWnd,L"BMP格式图像成功生成！请见程序或者CSV文件所在目录！",L"成功",MB_OK);
 			
 			}
 			break;
@@ -499,7 +501,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			
 				write_png(hBitmap,fname);
 				
-				MessageBox(hWnd,L"PNG格式图像成功生成！请见程序所在目录！",L"成功",MB_OK);
+				MessageBox(hWnd,L"PNG格式图像成功生成！请见程序或者CSV文件所在目录！",L"成功",MB_OK);
 			}
 			break;
 
@@ -550,6 +552,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	
 	case WM_LBUTTONDOWN:
+
+		{
+			WCHAR dirname[MAX_PATH];
+			get_export_dir(dirname);
+
+		}
+
 		
 		//datas.clear();
 		//InvalidateRect(hWnd,NULL,true);
@@ -867,15 +876,19 @@ void write_bmp(HBITMAP hBitmap,TCHAR*str1){
     WriteFile(hFile, (LPSTR)lpbi, dwDIBSize, &dwWritten, NULL);// 写入位图文件其余内容  
        
     //保存到内存  
-    char* BmpBuffer;  
-    BmpBuffer = new char [sizeof(BITMAPFILEHEADER) + dwDIBSize];  
-    memcpy(BmpBuffer,(LPSTR)&bmfHdr, sizeof(BITMAPFILEHEADER));  
-    memcpy(BmpBuffer+sizeof(BITMAPFILEHEADER),(LPSTR)lpbi, dwDIBSize);  
+    //char* BmpBuffer;  
+    //BmpBuffer = new char [sizeof(BITMAPFILEHEADER) + dwDIBSize];  
+    //memcpy(BmpBuffer,(LPSTR)&bmfHdr, sizeof(BITMAPFILEHEADER));  
+    //memcpy(BmpBuffer+sizeof(BITMAPFILEHEADER),(LPSTR)lpbi, dwDIBSize);  
   
     GlobalUnlock(hDib);   //清除     
     GlobalFree(hDib);  
     CloseHandle(hFile);  
-    
+
+	s=GetLastError();
+
+	//delete BmpBuffer;
+
 	delete []pJpp;  
     delete []m_pDibBits;  
 
@@ -928,3 +941,16 @@ void write_png(HBITMAP hBitmap,TCHAR*str1){
 	GdiplusShutdown(gditoken);
 
   }
+
+void get_export_dir(WCHAR*dirname){
+	OPENFILENAME ofn;
+	ofn.lStructSize=sizeof(OPENFILENAME);
+	ofn.lpstrFile=dirname;
+	ofn.nMaxFile=MAX_PATH;
+	ofn.Flags=OFN_EXPLORER|OFN_ENABLEHOOK|OFN_HIDEREADONLY|OFN_NOCHANGEDIR|OFN_PATHMUSTEXIST;
+	// ofn.lpfnHook=SaveAsHookProc;
+	ofn.lpstrFilter=TEXT("All File\0*.*\0\0");
+	GetSaveFileName(&ofn);
+
+	return;
+}
