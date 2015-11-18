@@ -17,7 +17,6 @@
 
 
 
-
 using namespace Gdiplus;
 
 #pragma comment(lib,"gdiplus.lib")
@@ -223,9 +222,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	static std::vector<PAINTDATA> bounders;
 	static std::vector<FPOINT> function;
 	static std::vector<PAINTDATA> marks;
+	static std::vector<std::string> img_vec;
 
 	static PAINTDATA*pCurrentData=NULL;
-
+	static bool bExist;
 	static int penStyle=PS_SOLID;
 
 	static COLORREF data_color=RGB(0,0,0);
@@ -363,6 +363,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				paint_points(hWnd,datas,tmpps,data_color);
 				EndPaint(hWnd, &tmpps);
 				free(szBuffer);
+				bExist=false;
+				for(int x=0;x<img_vec.size();x++){
+					if(img_vec[x]==poly){
+						bExist=true;
+					}
+				}
+				if(bExist){
+					;
+				}else{
+					img_vec.push_back(poly);
+				}
 				EnableWindow(btnPaintHwnd,true);
 				SetWindowText(btnPaintHwnd,L"绘图");
 				break;
@@ -380,6 +391,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		case ID_MENU_IMAGE_CLEAR:
 			datas.clear();
+			img_vec.clear();
 			InvalidateRect(hWnd,NULL,true);
 			UpdateWindow(hWnd);	
 			break;
@@ -471,7 +483,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				swprintf_s(fname,L"%2d_%2d_%d_%d_%d.bmp",st.wMonth,st.wDay,st.wHour,st.wMinute,st.wSecond);
 			
 				write_bmp(hBitmap,fname);
-				MessageBox(hWnd,L"BMP格式图像成功生成！请见程序或者CSV文件所在目录！",L"成功",MB_OK);
+				MessageBox(hWnd,L"BMP格式图像成功生成！请见程序或者CSV文件2所在目录！",L"成功",MB_OK);
 			
 			}
 			break;
@@ -553,13 +565,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	
 	case WM_LBUTTONDOWN:
 
-		{
-			WCHAR dirname[MAX_PATH];
-			get_export_dir(dirname);
-
-		}
-
-		
 		//datas.clear();
 		//InvalidateRect(hWnd,NULL,true);
 		//UpdateWindow(hWnd);	
@@ -583,6 +588,83 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		return 0;
 */
+	case WM_MOUSEWHEEL:
+		{
+			datas.clear();
+			InvalidateRect(hWnd,NULL,true);
+			UpdateWindow(hWnd);	
+			RECT rect;
+			GetWindowRect(hWnd,&rect);
+			int fwKeys= LOWORD(wParam);
+			short zDelta= (SHORT)HIWORD(wParam);
+			int xPos=LOWORD(lParam);
+			int yPos=HIWORD(lParam);
+			int winy=yPos-rect.top-60;//60 
+			int winx=xPos-rect.left-20;;//20
+			if(zDelta>0){
+				tick_dist*=0.8;
+			}else{
+				tick_dist*=1.25;
+			}
+			TCHAR tmpBuff[512];
+			swprintf_s(tmpBuff,512,L"%f",tick_dist*5);
+			SetWindowText(sttPaintHwnd_numn,tmpBuff);
+			SetWindowText(sttPaintHwnd_nums,tmpBuff);
+			SetWindowText(sttPaintHwnd_numw,tmpBuff);
+			SetWindowText(sttPaintHwnd_nume,tmpBuff);
+			InvalidateRect(hWnd,NULL,true);
+			UpdateWindow(hWnd);			
+			for(int i=0;i<img_vec.size();i++){
+				std::string tmpexp=img_vec[i];
+				TCHAR wexp[1024];
+				swprintf_s(wexp,L"%S",tmpexp.c_str());
+				SetWindowText(edtPaintHwnd,wexp);
+				SendMessage(hWnd,WM_COMMAND,MAKELONG(ID_PAINT_BUTTON,BN_CLICKED),(LPARAM)btnPaintHwnd);
+			}	
+			SetWindowText(edtPaintHwnd,L"");
+				
+				/*datas.clear();
+				FPOINT fp;
+				function.clear();
+				for(int j=-250;j<=250;j++){
+					std::string tmpstr=img_vec[i];
+					float x=i*((float)tick_dist)/25;
+					change_fx(tmpstr);
+					change_x(tmpstr,x);
+					float y=parse_poly(tmpstr);
+					fp.x=x;
+					fp.y=y;
+					function.push_back(fp);
+				}
+
+				for(int j=0;j<501-1;j++){
+					int x1_off=function[j].x/(tick_dist/25);
+					int y1_off=function[j].y/(tick_dist/25);
+					int x2_off=function[j+1].x/(tick_dist/25);
+					int y2_off=function[j+1].y/(tick_dist/25);
+					if(x1_off<-250||x1_off>250)continue;
+					if(y1_off<-250||y1_off>250)continue;
+					if(x2_off<-250||x2_off>250)continue;
+					if(y2_off<-250||y2_off>250)continue;
+					PAINTDATA tmpdata;
+					tmpdata.ptBeginX=260+x2_off;
+					tmpdata.ptBeginY=260-y2_off;
+					tmpdata.ptEndX=260+x1_off;
+					tmpdata.ptEndY=260-y1_off;
+					tmpdata.penStyle=PS_SOLID;
+					datas.push_back(tmpdata);
+				}
+				
+				PAINTSTRUCT tmpps;
+				BeginPaint(hWnd,&tmpps);
+				paint_points(hWnd,datas,tmpps,data_color);
+				EndPaint(hWnd, &tmpps);
+			}*/
+
+			//InvalidateRect(hWnd,NULL,true);
+			//UpdateWindow(hWnd);
+		}
+		break;
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
