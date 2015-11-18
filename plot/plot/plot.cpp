@@ -203,6 +203,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	static TCHAR*szBuffer;
 	static char szExpr[1024]={};
 	static float tick_dist=1;
+	
 
 	static HWND btnPaintHwnd;
 	static HWND edtPaintHwnd;
