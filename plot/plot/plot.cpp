@@ -40,6 +40,11 @@ using namespace Gdiplus;
 #define ID_MENU_PEN_COLOR_GREEN 0x25
 #define ID_MENU_PEN_COLOR_PURPLE 0x26
 
+#define ID_MENU_BG_COLOR_WHITE 0x41
+#define ID_MENU_BG_COLOR_GREEN 0x42
+#define ID_MENU_BG_COLOR_YELLOW 0x43
+#define ID_MENU_BG_COLOR_BLUE 0x44
+
 #define ID_MENU_IMAGE_EXPORT_BMP 0x31
 #define ID_MENU_IMAGE_EXPORT_PNG 0x32
 
@@ -230,6 +235,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	static int penStyle=PS_SOLID;
 
 	static COLORREF data_color=RGB(0,0,0);
+	static COLORREF bg_color=RGB(255,255,255);
 
 	switch (message)
 	{
@@ -254,7 +260,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			HMENU menu=CreateMenu();
 			HMENU menupop_image=CreatePopupMenu();
 			HMENU menupop_pen=CreatePopupMenu();
+			HMENU menupop_bg=CreatePopupMenu();
 			HMENU menupop_pen_color=CreatePopupMenu();
+			HMENU menupop_bg_color=CreatePopupMenu();
 			HMENU menupop_image_exp=CreatePopupMenu();
 
 			AppendMenu(menupop_image,MF_STRING,ID_MENU_IMAGE_CLEAR,L"清空");
@@ -268,10 +276,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			AppendMenu(menupop_image_exp,MF_STRING,ID_MENU_IMAGE_EXPORT_BMP,L"BMP格式");
 			AppendMenu(menupop_image_exp,MF_STRING,ID_MENU_IMAGE_EXPORT_PNG,L"PNG格式");
 			
+			AppendMenu(menupop_bg_color,MF_STRING,ID_MENU_BG_COLOR_GREEN,L"绿色");
+			AppendMenu(menupop_bg_color,MF_STRING,ID_MENU_BG_COLOR_WHITE,L"白色");
+			AppendMenu(menupop_bg_color,MF_STRING,ID_MENU_BG_COLOR_BLUE,L"蓝色");
+			AppendMenu(menupop_bg_color,MF_STRING,ID_MENU_BG_COLOR_YELLOW,L"黄色");
+			
 
 			AppendMenu(menu,MF_STRING|MF_POPUP,(UINT_PTR)menupop_image,L"图像");
 			AppendMenu(menu,MF_STRING|MF_POPUP,(UINT_PTR)menupop_pen,L"画笔");
+			AppendMenu(menu,MF_STRING|MF_POPUP,(UINT_PTR)menupop_bg,L"背景");
+			
 			AppendMenu(menupop_pen,MF_STRING|MF_POPUP,(UINT_PTR)menupop_pen_color,L"颜色");
+			AppendMenu(menupop_bg,MF_STRING|MF_POPUP,(UINT_PTR)menupop_bg_color,L"颜色");
+			
 			AppendMenu(menupop_image,MF_STRING|MF_POPUP,(UINT_PTR)menupop_image_exp,L"导出");
 			AppendMenu(menupop_image,MF_STRING,ID_MENU_IMAGE_IMPORT,L"导入");
 			SetMenu(hWnd,menu);
@@ -517,7 +534,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				MessageBox(hWnd,L"PNG格式图像成功生成！请见程序或者CSV文件所在目录！",L"成功",MB_OK);
 			}
 			break;
-
+		case ID_MENU_BG_COLOR_WHITE:
+			bg_color=RGB(255,255,255);
+			break;
+		case ID_MENU_BG_COLOR_YELLOW:
+			bg_color=RGB(255,255,0);
+			break;
+		case ID_MENU_BG_COLOR_GREEN:
+			bg_color=RGB(50,205,50);
+			break;
+		case ID_MENU_BG_COLOR_BLUE:
+			bg_color=RGB(0,0,205);
+			break;
 		case ID_MENU_PEN_COLOR_BLACK:
 			data_color=RGB(0,0,0);
 			break;
@@ -539,6 +567,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_PAINT:
 		{
+			{
+			HDC hdc=GetDC(hWnd);
+			HBRUSH hbrush;
+			hbrush=CreateSolidBrush(bg_color);
+			SelectObject(hdc,hbrush);
+			PAINTSTRUCT tmpps;
+			BeginPaint(hWnd,&tmpps);
+		
+			Rectangle(hdc,0,0,520,520);
+		
+			DeleteObject(hbrush);
+			ReleaseDC(hWnd,hdc);
+			EndPaint(hWnd, &tmpps);
+			}
 			hdc = BeginPaint(hWnd, &ps);
 			
 			// TODO: 在此添加任意绘图代码...
@@ -565,7 +607,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	
 	case WM_LBUTTONDOWN:
-
+		
 		//datas.clear();
 		//InvalidateRect(hWnd,NULL,true);
 		//UpdateWindow(hWnd);	

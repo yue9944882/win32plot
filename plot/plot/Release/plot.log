@@ -1,16 +1,16 @@
-﻿生成启动时间为 2015/11/18 16:41:01。
+﻿生成启动时间为 2015/11/20 1:36:28。
      1>项目“C:\Users\guguli\Documents\GitHub\win32plot\plot\plot\plot.vcxproj”在节点 2 上(Build 个目标)。
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /sdl /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"Release\plot.pch" /Fo"Release\\" /Fd"Release\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt plot.cpp
          plot.cpp
-     1>plot.cpp(344): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
-     1>plot.cpp(345): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
-     1>plot.cpp(346): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
-     1>plot.cpp(347): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
-     1>plot.cpp(367): warning C4018: “<”: 有符号/无符号不匹配
-     1>plot.cpp(605): warning C4305: “*=”: 从“double”到“float”截断
-     1>plot.cpp(617): warning C4018: “<”: 有符号/无符号不匹配
-     1>plot.cpp(718): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+     1>plot.cpp(362): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
+     1>plot.cpp(363): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
+     1>plot.cpp(364): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
+     1>plot.cpp(365): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
+     1>plot.cpp(385): warning C4018: “<”: 有符号/无符号不匹配
+     1>plot.cpp(648): warning C4305: “*=”: 从“double”到“float”截断
+     1>plot.cpp(660): warning C4018: “<”: 有符号/无符号不匹配
+     1>plot.cpp(761): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\guguli\Documents\GitHub\win32plot\plot\Release\plot.exe" /INCREMENTAL:NO /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\guguli\Documents\GitHub\win32plot\plot\Release\plot.pdb" /SUBSYSTEM:WINDOWS /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\guguli\Documents\GitHub\win32plot\plot\Release\plot.lib" /MACHINE:X86 /SAFESEH Release\plot.res
          Release\global_val.obj
@@ -28,4 +28,4 @@
 
 生成成功。
 
-已用时间 00:00:01.99
+已用时间 00:00:02.19
