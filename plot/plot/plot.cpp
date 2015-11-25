@@ -67,6 +67,8 @@ typedef struct tagPoint{
 	float y;
 }FPOINT;
 
+
+
 // 此代码模块中包含的函数的前向声明:
 ATOM				MyRegisterClass(HINSTANCE hInstance);
 BOOL				InitInstance(HINSTANCE, int);
@@ -247,6 +249,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			mark_def(marks);
 
 			// Menu Defination
+			
 			/*
 			HMENU menubar=CreateMenu();
 			HMENU menupop=CreatePopupMenu();
@@ -257,6 +260,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			AppendMenu(menubar,MF_STRING|MF_POPUP,(UINT_PTR)menupop,L"选择线型");
 			SetMenu(hWnd,menubar);
 			*/
+
 			HMENU menu=CreateMenu();
 			HMENU menupop_image=CreatePopupMenu();
 			HMENU menupop_pen=CreatePopupMenu();
@@ -364,9 +368,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					int x2_off=function[i+1].x/(tick_dist/25);
 					int y2_off=function[i+1].y/(tick_dist/25);
 					if(x1_off<-250||x1_off>250)continue;
-					if(y1_off<-250||y1_off>250)continue;
 					if(x2_off<-250||x2_off>250)continue;
-					if(y2_off<-250||y2_off>250)continue;
+					if(y1_off<-250||y1_off>250){
+						//Save bounder
+						
+						continue;
+					}
+					if(y2_off<-250||y2_off>250){
+						//Save bounder
+
+						continue;
+					}
 					PAINTDATA tmpdata;
 					tmpdata.ptBeginX=260+x2_off;
 					tmpdata.ptBeginY=260-y2_off;
@@ -392,6 +404,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				}else{
 					img_vec.push_back(poly);
 				}
+
 				EnableWindow(btnPaintHwnd,true);
 				SetWindowText(btnPaintHwnd,L"绘图");
 				break;
@@ -597,6 +610,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			EndPaint(hWnd, &ps);
 		}
+
+		//Paint Bounder
+
+
+		SetFocus(edtPaintHwnd);
 		break;
 	case WM_CTLCOLORSTATIC:
 		SetBkMode((HDC)wParam,TRANSPARENT);
@@ -663,7 +681,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				swprintf_s(wexp,L"%S",tmpexp.c_str());
 				SetWindowText(edtPaintHwnd,wexp);
 				SendMessage(hWnd,WM_COMMAND,MAKELONG(ID_PAINT_BUTTON,BN_CLICKED),(LPARAM)btnPaintHwnd);
+			
+				//Paint bounder
+
+
 			}	
+
+
+
+			
 			SetWindowText(edtPaintHwnd,L"");
 				
 				/*datas.clear();

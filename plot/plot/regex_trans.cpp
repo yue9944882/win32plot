@@ -45,7 +45,7 @@ int stack_transform(char*stack,int begin,int end,int&stack_pos){
 	bool valid_m=std::regex_match(s,result,pattern_m);
 
 	if(valid){
-		std::cout<<"Catch Operator:"<<result[1]<<std::endl;
+		//std::cout<<"Catch Operator:"<<result[1]<<std::endl;
 		float fr=pop_N();
 		float fl=pop_N();
 
@@ -59,7 +59,7 @@ int stack_transform(char*stack,int begin,int end,int&stack_pos){
 	}
 
 	if(valid_b){
-		std::cout<<"Stripe Brancket:"<<result[1]<<std::endl;
+		//std::cout<<"Stripe Brancket:"<<result[1]<<std::endl;
 		
 		stack[stack_pos]='N';
 		stack_pos++;
@@ -68,7 +68,7 @@ int stack_transform(char*stack,int begin,int end,int&stack_pos){
 	}
 
 	if(valid_m){
-		std::cout<<"Minus Detect:"<<result[1]<<std::endl;
+		//std::cout<<"Minus Detect:"<<result[1]<<std::endl;
 		stack[stack_pos]='N';
 		stack_pos++;
 		float f=pop_N();
@@ -97,11 +97,11 @@ int num_transform(char*stack,int begin,int end,int&stack_pos){
 	std::match_results<std::string::const_iterator> result;
 	bool valid=std::regex_match(s,result,pattern);
 
-
+	/*
 	if(valid){
 		std::cout<<"Catch:"<<result[1]<<std::endl;
 	}
-
+	*/
 	float f=atof(result[1].str().c_str());
 
 	stack[stack_pos]='N';
@@ -123,14 +123,14 @@ float calc(float fl,float fr,char op){
 		return fl*fr;
 	case '/':
 		if(fr)return fl/fr;
-		else return 0;
+		else return INF;
 	case '^':
 		return pow(fl,(int)fr);
 	case '&':
 		if(fl==1)return sin(fr);
 		if(fl==2){
 			if(fr>0)return log(fr);
-			else return 0;
+			else return INF;
 		}
 		if(fl==3)return cos(fr);
 		if(fl==4)return exp(fr);
