@@ -18,4 +18,4 @@ sin(x)*log(x)+1
 
 1+x/(1+x)*sin(x)
 
-![](http://files.cnblogs.com/files/guguli/100005656519803.gif)
+![](http://files.cnblogs.com/files/guguli/100003309726139.gif)
